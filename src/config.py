@@ -5,7 +5,7 @@ import logging
 class Config:
     LOG_LEVEL = config('LOG_LEVEL', default='INFO')
     TIMEZONE = config('TIMEZONE', default='America/Sao_Paulo')
-    
+
     SQLALCHEMY_DATABASE_URI = config('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

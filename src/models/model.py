@@ -65,4 +65,3 @@ class Order(BaseModel):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
     flavor_id = db.Column(db.Integer, db.ForeignKey('flavor.id'), primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
-    
