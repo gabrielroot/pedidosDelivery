@@ -1,3 +1,3 @@
-from .model import Item, Flavor, FlavorItem, Order, Client
+from .model import Item, Flavor, Order, Client
 
-__all__ = ('Item', 'Flavor', 'FlavorItem', 'Order', 'Client')
+__all__ = ('Item', 'Flavor', 'Order', 'Client')

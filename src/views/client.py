@@ -50,7 +50,7 @@ class ClientView(MethodView):
         return jsonify(data), 200
 
     def delete(self, pk):
-        client = Client.query.filter_by(id=pk).first_or_404(description='Client not found')
+        client = Client.query.filter_by(id=pk, deleted_at=None).first_or_404(description='Client not found')
         client.deleted_at = datetime.datetime.utcnow()
         client.save()
         return jsonify({}), 203

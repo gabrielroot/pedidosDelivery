@@ -46,7 +46,7 @@ class FlavorView(MethodView):
 
     def delete(self, pk):
 
-        flavor = Flavor.query.filter_by(id=pk).first_or_404(description='Flavor not found')
+        flavor = Flavor.query.filter_by(id=pk, deleted_at=None).first_or_404(description='Flavor not found')
         flavor.deleted_at = datetime.datetime.utcnow()
         flavor.save()
         return jsonify({}), 203
