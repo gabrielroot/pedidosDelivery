@@ -25,8 +25,10 @@ class BaseModel(db.Model):
 
 flavorItems = db.Table(
     'flavorItems',
-    db.Column('flavor_id', db.Integer, db.ForeignKey('flavor.id'), primary_key=True),
-    db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True),
+    db.Column('id', db.Integer, primary_key=True, autoincrement=True, unique=True),
+    db.Column('flavor_id', db.Integer, db.ForeignKey('flavor.id', ondelete="CASCADE"), primary_key=True, nullable=False),
+    db.Column('item_id', db.Integer, db.ForeignKey('item.id', ondelete="CASCADE"), primary_key=True, nullable=False),
+    db.UniqueConstraint('flavor_id', 'item_id'),
     db.Column('created_at', db.DateTime, default=datetime.utcnow, nullable=False),
     db.Column('updated_at', db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False),
     db.Column('deleted_at', db.DateTime, nullable=True, index=True)
@@ -45,7 +47,8 @@ class Item(BaseModel):
         'Flavor',
         secondary=flavorItems,
         lazy='subquery',
-        backref=db.backref('Item', lazy=True)
+        backref=db.backref('Item', lazy=True),
+        cascade='all, delete'
     )
 
 
@@ -56,6 +59,20 @@ class Flavor(BaseModel):
     name = db.Column(db.String(200))
     available = db.Column(db.Boolean, nullable=False, default=True)
 
+orders = db.Table(
+    'orders',
+    db.Column('id', db.Integer, primary_key=True, autoincrement=True),
+    # db.Column('flavor_id', db.Integer, db.ForeignKey('flavorItems.flavor_id'), nullable=False, primary_key=True),
+    # db.Column('item_id', db.Integer, db.ForeignKey('flavorItems.item_id'), nullable=False, primary_key=True),
+    # db.UniqueConstraint('flavor_id', 'item_id'),
+    db.Column('flavorItems_id', db.Integer, db.ForeignKey('flavorItems.id', ondelete="CASCADE")),
+    db.Column('client_id', db.Integer, db.ForeignKey('client.id', ondelete="CASCADE")),
+    db.Column('quantity', db.Integer),
+    db.Column('observation',db.String(200), nullable=False),
+    db.Column('created_at', db.DateTime, default=datetime.utcnow, nullable=False),
+    db.Column('updated_at', db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False),
+    db.Column('deleted_at', db.DateTime, nullable=True, index=True)
+)
 
 class Client(BaseModel):
     __tablename__ = 'client'
@@ -64,13 +81,13 @@ class Client(BaseModel):
     name = db.Column(db.String(200), nullable=False)
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(200), nullable=False)
-
-
-class Order(BaseModel):
-    __tablename__ = 'order'
-
-    quantity = db.Column(db.Integer)
-
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
-    flavor_id = db.Column(db.Integer, db.ForeignKey('flavor.id'), primary_key=True)
-    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
+    street = db.Column(db.String(200), nullable=False)
+    district = db.Column(db.String(200), nullable=False)
+    number = db.Column(db.Integer)
+    orders = db.relationship(
+        'flavorItems',
+        secondary=orders,
+        lazy='subquery',
+        backref=db.backref('Client', lazy=True),
+        cascade='all, delete'
+    )

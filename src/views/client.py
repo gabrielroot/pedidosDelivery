@@ -18,10 +18,14 @@ class ClientView(MethodView):
         req = json.loads(request.data)
         client = Client()
 
-        if 'name' in req and 'password' in req and 'email' in req:
+        if 'name' in req and 'password' in req and 'email' in req and 'street' in req \
+           and 'district' in req and 'number' in req:
             client.name = req['name']
             client.password = req['password']
             client.email = req['email']
+            client.street = req['street']
+            client.district = req['district']
+            client.name = req['name']
         else:
             return jsonify({"message": "Body is invalid"})
 
@@ -44,6 +48,16 @@ class ClientView(MethodView):
 
         if 'password' in req:
             client.password = req['password']
+
+        if 'street' in req:
+            client.street = req['street']
+
+        if 'district' in req:
+            client.district = req['district']
+
+        if 'number' in req:
+            client.number = req['number']
+        
 
         client.save()
         data = self.schema.dump(client)

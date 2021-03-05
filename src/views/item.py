@@ -24,14 +24,14 @@ class ItemView(MethodView):
         if 'name' not in req or 'available' not in req or 'price' not in req or 'flavors' not in req:
             return jsonify({"message": "Body is invalid"})
 
-        if 'name' in req:
-            item.name = req['name']
+        if 'name' in req and 'price' in req:
+                item.name = req['name']
+                item.price = req['price']
+        else:
+            return jsonify({"message": "Body is invalid"})
 
         if 'available' in req:
             item.available = req['available']
-
-        if 'price' in req:
-            item.price = req['price']
 
         if 'description' in req:
             item.description = req['description']

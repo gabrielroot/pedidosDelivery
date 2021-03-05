@@ -6,4 +6,4 @@ class ClientSchema(ma.Schema):
 
     class Meta:
         model = Client
-        fields = ('id', 'name', 'email', 'created_at', 'updated_at')
+        fields = ('id', 'name', 'email', 'street', 'district', 'number', 'created_at', 'updated_at')
