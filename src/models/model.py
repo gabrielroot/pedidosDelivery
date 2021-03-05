@@ -23,6 +23,16 @@ class BaseModel(db.Model):
         db.session.commit()
 
 
+flavorItems = db.Table(
+    'flavorItems',
+    db.Column('flavor_id', db.Integer, db.ForeignKey('flavor.id'), primary_key=True),
+    db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True),
+    db.Column('created_at', db.DateTime, default=datetime.utcnow, nullable=False),
+    db.Column('updated_at', db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False),
+    db.Column('deleted_at', db.DateTime, nullable=True, index=True)
+)
+
+
 class Item(BaseModel):
     __tablename__ = 'item'
 
@@ -31,6 +41,12 @@ class Item(BaseModel):
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(200), nullable=True)
     available = db.Column(db.Boolean, nullable=False, default=True)
+    flavors = db.relationship(
+        'Flavor',
+        secondary=flavorItems,
+        lazy='subquery',
+        backref=db.backref('Item', lazy=True)
+    )
 
 
 class Flavor(BaseModel):
@@ -39,13 +55,6 @@ class Flavor(BaseModel):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200))
     available = db.Column(db.Boolean, nullable=False, default=True)
-
-
-class FlavorItem(BaseModel):
-    __tablename__ = 'flavorItem'
-
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
-    flavor_id = db.Column(db.Integer, db.ForeignKey('flavor.id'), primary_key=True)
 
 
 class Client(BaseModel):
@@ -65,4 +74,3 @@ class Order(BaseModel):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
     flavor_id = db.Column(db.Integer, db.ForeignKey('flavor.id'), primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
-    

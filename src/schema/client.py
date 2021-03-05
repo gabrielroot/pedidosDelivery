@@ -2,7 +2,7 @@ from src import ma
 from src.models import Client
 
 
-class ItemSchema(ma.Schema):
+class ClientSchema(ma.Schema):
 
     class Meta:
         model = Client
