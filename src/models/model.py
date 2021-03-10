@@ -23,14 +23,12 @@ class BaseModel(db.Model):
         db.session.commit()
 
 
-flavorItems = db.Table(
-    'flavorItems',
-    db.Column('flavor_id', db.Integer, db.ForeignKey('flavor.id'), primary_key=True),
-    db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True),
-    db.Column('created_at', db.DateTime, default=datetime.utcnow, nullable=False),
-    db.Column('updated_at', db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False),
-    db.Column('deleted_at', db.DateTime, nullable=True, index=True)
-)
+class FlavorItems(BaseModel):
+    __tablename__ = 'flavorItems'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True,  unique=True)
+    flavor_id = db.Column(db.Integer, db.ForeignKey('flavor.id', ondelete="CASCADE"), primary_key=True, nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id', ondelete="CASCADE"), primary_key=True, nullable=False)
 
 
 class Item(BaseModel):
@@ -43,9 +41,10 @@ class Item(BaseModel):
     available = db.Column(db.Boolean, nullable=False, default=True)
     flavors = db.relationship(
         'Flavor',
-        secondary=flavorItems,
+        secondary=FlavorItems.__table__,
         lazy='subquery',
-        backref=db.backref('Item', lazy=True)
+        backref=db.backref('Item', lazy=True),
+        cascade='all, delete'
     )
 
 
@@ -57,6 +56,18 @@ class Flavor(BaseModel):
     available = db.Column(db.Boolean, nullable=False, default=True)
 
 
+class Orders(BaseModel):
+    __tablename__ = 'orders'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    flavorItems_id = db.Column(db.Integer, db.ForeignKey('flavorItems.id', ondelete="CASCADE"), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('client.id', ondelete="CASCADE"), nullable=False)
+    
+    quantity = db.Column(db.Integer)
+    observation = db.Column(db.String(200), nullable=True)
+    delivered = db.Column(db.Boolean, nullable=False, default=False)
+
+
 class Client(BaseModel):
     __tablename__ = 'client'
 
@@ -64,13 +75,13 @@ class Client(BaseModel):
     name = db.Column(db.String(200), nullable=False)
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(200), nullable=False)
-
-
-class Order(BaseModel):
-    __tablename__ = 'order'
-
-    quantity = db.Column(db.Integer)
-
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), primary_key=True)
-    flavor_id = db.Column(db.Integer, db.ForeignKey('flavor.id'), primary_key=True)
-    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), primary_key=True)
+    street = db.Column(db.String(200), nullable=False)
+    district = db.Column(db.String(200), nullable=False)
+    number = db.Column(db.Integer)
+    orders = db.relationship(
+        FlavorItems,
+        secondary=Orders.__table__,
+        lazy='subquery',
+        backref=db.backref('Client', lazy=True),
+        cascade='all, delete'
+    )

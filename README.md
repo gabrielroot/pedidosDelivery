@@ -4,7 +4,7 @@
 # Conceptual data model
 ![Captura de tela](modelo_conceitual.png?raw=true "Title")
 
-### Make enviroment ###
+### Make environment ###
 ```
 pyenv shell 3.8.0 &&  python -m venv .venv && source .venv/bin/activate
 pip install -U pip setuptools

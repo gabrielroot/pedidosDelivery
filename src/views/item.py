@@ -11,27 +11,25 @@ class ItemView(MethodView):
     schema = ItemSchema()
 
     def get(self):
-
-        items = Item.query.filter(Item.deleted_at is None).all()
+        items = Item.query.filter(Item.deleted_at==None).all()
         data = self.schema.dump(items, many=True)
         return jsonify(data), 200
 
     def post(self):
-
         req = json.loads(request.data)
         item = Item()
 
         if 'name' not in req or 'available' not in req or 'price' not in req or 'flavors' not in req:
             return jsonify({"message": "Body is invalid"})
 
-        if 'name' in req:
-            item.name = req['name']
+        if 'name' in req and 'price' in req:
+                item.name = req['name']
+                item.price = req['price']
+        else:
+            return jsonify({"message": "Body is invalid"})
 
         if 'available' in req:
             item.available = req['available']
-
-        if 'price' in req:
-            item.price = req['price']
 
         if 'description' in req:
             item.description = req['description']

@@ -1,8 +1,10 @@
 import json
 import datetime
+from src.models import Client
+from src.models import Item
+from src.models import Orders
 from flask import jsonify, request
 from flask.views import MethodView
-from src.models import Client
 from src.schema.client import ClientSchema
 
 
@@ -10,7 +12,9 @@ class ClientView(MethodView):
     schema = ClientSchema()
 
     def get(self):
-        clients = Client.query.filter_by(deleted_at=None).all()
+        clients = Client.query.filter(Client.deleted_at==None).all()
+        print(clients[1].orders)
+        print(Client.query.join(Client.orders).filter_by(item_id=Item.id).all())
         data = self.schema.dump(clients, many=True)
         return jsonify(data), 200
 
@@ -18,10 +22,14 @@ class ClientView(MethodView):
         req = json.loads(request.data)
         client = Client()
 
-        if 'name' in req and 'password' in req and 'email' in req:
+        if 'name' in req and 'password' in req and 'email' in req and 'street' in req \
+           and 'district' in req and 'number' in req:
             client.name = req['name']
             client.password = req['password']
             client.email = req['email']
+            client.street = req['street']
+            client.district = req['district']
+            client.name = req['name']
         else:
             return jsonify({"message": "Body is invalid"})
 
@@ -44,6 +52,16 @@ class ClientView(MethodView):
 
         if 'password' in req:
             client.password = req['password']
+
+        if 'street' in req:
+            client.street = req['street']
+
+        if 'district' in req:
+            client.district = req['district']
+
+        if 'number' in req:
+            client.number = req['number']
+        
 
         client.save()
         data = self.schema.dump(client)
