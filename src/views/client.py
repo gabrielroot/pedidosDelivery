@@ -1,8 +1,10 @@
 import json
 import datetime
+from src.models import Client
+from src.models import Item
+from src.models import Orders
 from flask import jsonify, request
 from flask.views import MethodView
-from src.models import Client
 from src.schema.client import ClientSchema
 
 
@@ -10,7 +12,9 @@ class ClientView(MethodView):
     schema = ClientSchema()
 
     def get(self):
-        clients = Client.query.filter_by(deleted_at=None).all()
+        clients = Client.query.filter(Client.deleted_at==None).all()
+        print(clients[1].orders)
+        print(Client.query.join(Client.orders).filter_by(item_id=Item.id).all())
         data = self.schema.dump(clients, many=True)
         return jsonify(data), 200
 
